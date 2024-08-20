@@ -1,0 +1,71 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-image: url(bgpc.png);
+    background-repeat: repeat;
+    background-size: cover;
+    height: 90vh;
+}
+
+#restodecosas{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+#caja{
+    box-shadow: 0 0 15px 5px;
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+}
+
+h2{
+    font-size: 4vh;
+    margin-top: 3%;
+    margin-bottom: 3%;
+}
+
+#info{
+    width: 100%;
+    padding: 5%;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    flex-direction: column;
+}
+
+#formulario{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+header, footer{
+    background-color: black;
+    height: 5vh;
+}
+
+.rellenar{
+    width: 90%;
+    height: 50%;
+}
+
+@media screen and (max-width: 700px) {
+    #caja{
+        width: 85%;
+        height: 85%;
+    }
+    body{
+        background-image: url(bgcel.png);
+    }
+}
