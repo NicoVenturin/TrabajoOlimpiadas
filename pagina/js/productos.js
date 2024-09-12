@@ -3,6 +3,7 @@ const container = document.getElementById('cardcontainer');
 const carritopc = document.getElementById('nav-lista')
 const cardcontainer = document.getElementById('cardcontainer');
 var arraytexto = [];
+var arrayNombresCarrito = [];
 var carrito = [];
 var precios = [];
 var preciosCarrito = [];
@@ -10,10 +11,61 @@ var precioTotal = 0;
 var index = 0;
 const precioTotalContainer = document.createElement('div');
 const botonComprar = document.createElement('button');
+const botonEliminarTodo = document.createElement('button');
+botonEliminarTodo.innerHTML = "Vaciar Carrito";
 botonComprar.innerHTML = "Comprar";
 precioTotalContainer.innerHTML = `<span style="color: #FBFFA9;">Precio Total: $0</span>`;
 carritopc.appendChild(precioTotalContainer);
+carritopc.appendChild(botonEliminarTodo);
 carritopc.appendChild(botonComprar);
+function comprarCarrito(){ //poner acciones al comprar cosas
+  alert("Se realizo el pedido");
+  var stringArray = JSON.stringify(arrayNombresCarrito);          
+  var dataToSend1 = "precioTotal=" + encodeURIComponent(precioTotal)+"&arrayArticulos=" + encodeURIComponent(stringArray);
+  //var dataToSend2 = "arrayArticulos=" + encodeURIComponent(stringArray);
+  // Prepare the data to send
+  var xhr = new XMLHttpRequest();
+  // Create a new XMLHttpRequest object
+  xhr.open("POST", "js/art.php", true);
+  
+  // Specify the request method, PHP script URL, and asynchronous
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  
+  // Set the content type
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+  
+          // Check if the request is complete
+          if (xhr.status === 200) {
+  
+              // Check if the request was successful
+              console.log(xhr.responseText);
+              // Output the response from the PHP script
+          } else {
+              console.error("Error:", xhr.status);
+              // Log an error if the request was unsuccessful
+          }
+  
+      }
+  
+  }
+      ;
+  xhr.send(dataToSend1);     
+  //xhr.send(dataToSend2);
+  eliminarTodo();
+
+}
+function eliminarTodo(){
+  carrito.splice(0,carrito.length);
+  preciosCarrito.splice(0,preciosCarrito.length);
+  arrayNombresCarrito.splice(0,arrayNombresCarrito.length);
+  precioTotal = 0;
+  carritopc.innerHTML = '';
+  carritopc.appendChild(precioTotalContainer);
+  carritopc.appendChild(botonEliminarTodo);
+  carritopc.appendChild(botonComprar);
+  precioTotalContainer.innerHTML = `<span style="color: #FBFFA9;">Precio Total:${precioTotal}</span>`;
+}
 const api = fetch('conexionbd.php')
             .then(res=>res.json())
             .then(function(datos){
@@ -59,33 +111,36 @@ const api = fetch('conexionbd.php')
                     if(arraytexto[i] == this.id){
                       const item = document.createElement('li');
                       carritopc.removeChild(precioTotalContainer);
+                      carritopc.removeChild(botonEliminarTodo);
                       carritopc.removeChild(botonComprar);
                       item.innerHTML = `
                       <span style="color: #FBFFA9;">
                       ${arraytexto[i]} $${precios[i]}
                       </span>
                       <button class="boton-eliminar">Eliminar</button>`;
+                      arrayNombresCarrito.push(arraytexto[i]);
                       carrito.push(item);
                       preciosCarrito.push(precios[i]);
                       precioTotal = precioTotal+precios[i];
                       const botonEliminar = item.querySelector('.boton-eliminar');
                       //const precioTotalContainer = document.createElement('div');
                       precioTotalContainer.innerHTML = `<span style="color: #FBFFA9;">Precio Total:${precioTotal}</span>`;
-                      
+              
                       botonEliminar.addEventListener('click', () => {
                         const indiceItem = carrito.indexOf(item);
                         const indicePrecio = preciosCarrito.indexOf(precios[i]);
                         carrito.splice(indiceItem,1);
+                        arrayNombresCarrito.splice(indiceItem,1);
                         precioTotal = precioTotal-preciosCarrito[indicePrecio];
                         preciosCarrito.splice(indicePrecio,1);
                         item.remove();
                         precioTotalContainer.innerHTML = `<span style="color: #FBFFA9;">Precio Total:${precioTotal}</span>`;
                       });
-                      botonComprar.addEventListener('click', ()=>{
-                        alert("Se realizo el pedido");
-                      })
+                      botonEliminarTodo.addEventListener('click',eliminarTodo);
+                      botonComprar.addEventListener('click',comprarCarrito);
                       carritopc.appendChild(item);
                       carritopc.appendChild(precioTotalContainer);
+                      carritopc.appendChild(botonEliminarTodo);
                       carritopc.appendChild(botonComprar);
                     }
 
@@ -94,3 +149,5 @@ const api = fetch('conexionbd.php')
                }
             });
 
+
+            

@@ -1,20 +1,27 @@
-<?php
+<?php session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $usuario = $_POST["usuario"];
     $contraseña = $_POST["contraseña"];
     $valor = 1;
     $conexion = mysqli_connect("localhost", "root", "", "bd_ecommerce");
-
+   
     if (!$conexion) {
         die("Error en la conexión a la base de datos: " . mysqli_connect_error());
     }
 
     $consulta = "SELECT * FROM usuarios WHERE usuario = '$usuario' AND contraseña = '$contraseña'";
+    $id_usuario = "SELECT id_usuario FROM usuarios WHERE `usuario` = '$usuario'";
     $resultado = mysqli_query($conexion, $consulta);
+    if($resultado->num_rows > 0){
+        while($row=$resultado->fetch_assoc()){
+            $valor = $row["id_usuario"];
+        }
+    }
+    $_SESSION['id_usuario']=$valor;
 
     if (mysqli_num_rows($resultado) == 1) {
         echo "Inicio de sesión exitoso. ¡Bienvenido, $usuario!";
-        $consultaAdmin = "SELECT id_tip_usu FROM usuarios WHERE usuario = '$usuario' AND contraseña = '$contraseña'";
+        $consultaAdmin = "SELECT id_tip_usu FROM usuarios WHERE `usuario` = '$usuario' AND `contraseña` = '$contraseña'";
         $resultadoAdmin = mysqli_query($conexion,$consultaAdmin);
         
         if($resultadoAdmin->num_rows > 0){
@@ -23,22 +30,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         
-        echo '<div>
-            <h2>Redirección al Login</h2>
-        <a href="pagina/index.php"><button id="boton">Volver al Login</button></a>
-        </div> ';
+        //echo '<div>
+        //    <h2>Redirección al Login</h2>
+        //<a href="pagina/index.php"><button id="boton">Volver al Login</button></a>
+        //</div> ';
         if($valor == 2){
-            echo '¡Hola Admin ' .$usuario . '!';
-            echo '<div>
-            <h2>Redirección a la lista de usuarios</h2>
-            <a href="pagina/listausu.html"><button id="boton">usuarios</button></a>
-            </div> ';
+            //echo '¡Hola Admin ' .$usuario . '!';
+            //echo '<div>
+            //<h2>Redirección a la lista de usuarios</h2>
+            //<a href="pagina/listausu.html"><button id="boton">usuarios</button></a>
+            //</div> ';
+            header("Location: pagina/admin.html");
+            exit();
+        }
+        else{
+            header("Location: pagina/index.php");
+            exit();
         }
         // Aquí puedes redirigir al usuario a la página de inicio
     } 
     else {
-        echo "Nombre de usuario o contraseña incorrectos";
-        echo '<div id="blanco"> <h2>Redirección al Login</h2> <a href="login.html"><button id="boton">Volver al Login</button></a>        </div>';
+        //echo "Nombre de usuario o contraseña incorrectos";
+        //echo '<div id="blanco"> <h2>Redirección al Login</h2> <a href="login.html"><button id="boton">Volver al Login</button></a>        </div>';
+        header("Location: login.html");
+        exit();
     }
 
     mysqli_close($conexion);
